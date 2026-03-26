@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <title>Roblox Lua Obfuscator (Demo)</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Roblox Lua Obfuscator – Demo</h1>
+
+    <div class="container">
+        <div class="panel">
+            <h2>Input (Lua-kode)</h2>
+            <textarea id="inputCode" placeholder="Lim inn Lua-koden din her..."></textarea>
+        </div>
+
+        <div class="panel">
+            <h2>Output (Obfuskert)</h2>
+            <textarea id="outputCode" readonly></textarea>
+        </div>
+    </div>
+
+    <button id="obfuscateBtn">Obfusker</button>
+
+    <p class="note">
+        Denne obfuskatoren er kun en enkel, pedagogisk demo (fjerner kommentarer, whitespace og gir noen variabler nye navn).
+        Ikke stol på den for sikkerhet eller anti-cheat.
+    </p>
+
+    <script src="app.js"></script>
+</body>
+</html>
