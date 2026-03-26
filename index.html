@@ -1,32 +1,45 @@
 <!DOCTYPE html>
-<html lang="no">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Roblox Lua Obfuscator (Demo)</title>
+    <title>NovaLua Obfuscator</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Roblox Lua Obfuscator – Demo</h1>
 
-    <div class="container">
-        <div class="panel">
-            <h2>Input (Lua-kode)</h2>
-            <textarea id="inputCode" placeholder="Lim inn Lua-koden din her..."></textarea>
+<header>
+    <h1>NovaLua</h1>
+    <p>Advanced Roblox Lua Obfuscator</p>
+</header>
+
+<main>
+    <section class="editor">
+        <div class="box">
+            <h2>Input</h2>
+            <textarea id="inputCode" placeholder="Paste your Lua script here..."></textarea>
         </div>
 
-        <div class="panel">
-            <h2>Output (Obfuskert)</h2>
+        <div class="box">
+            <h2>Output</h2>
             <textarea id="outputCode" readonly></textarea>
         </div>
+    </section>
+
+    <div class="controls">
+        <select id="mode">
+            <option value="light">Light Obfuscation</option>
+            <option value="medium">Medium Obfuscation</option>
+            <option value="strong">Strong Obfuscation</option>
+        </select>
+
+        <button id="runBtn">Obfuscate</button>
     </div>
+</main>
 
-    <button id="obfuscateBtn">Obfusker</button>
+<footer>
+    <p>NovaLua © 2026 — Built for creators</p>
+</footer>
 
-    <p class="note">
-        Denne obfuskatoren er kun en enkel, pedagogisk demo (fjerner kommentarer, whitespace og gir noen variabler nye navn).
-        Ikke stol på den for sikkerhet eller anti-cheat.
-    </p>
-
-    <script src="app.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
