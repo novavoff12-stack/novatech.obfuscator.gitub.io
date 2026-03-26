@@ -1,17 +1,5 @@
-function removeLineComments(code) {
-    // Fjerner -- kommentar til linjeslutt (ikke perfekt, men greit for demo)
-    return code.split("\n").map(line => {
-        const idx = line.indexOf("--");
-        if (idx !== -1) {
-            return line.slice(0, idx);
-        }
-        return line;
-    }).join("\n");
-}
-
-function removeBlockComments(code) {
-    // Naiv fjerning av --[[ ... ]] blokker
-    return code.replace(/--
+function stripComments(code) {
+    code = code.replace(/--
 
 \[
 
@@ -20,59 +8,81 @@ function removeBlockComments(code) {
 \]
 
 /g, "");
+    code = code.replace(/--.*/g, "");
+    return code;
 }
 
-function compressWhitespace(code) {
-    // Fjerner overflødig whitespace og tomme linjer
+function minify(code) {
     return code
         .split("\n")
-        .map(line => line.trim())
-        .filter(line => line.length > 0)
+        .map(l => l.trim())
+        .filter(l => l.length > 0)
         .join(" ");
 }
 
-function renameSimpleVariables(code) {
-    // Veldig enkel variabel-rename: finner "local <navn> =" og gir nye navn
-    const varRegex = /\blocal\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*=/g;
-    let match;
-    let counter = 1;
+function renameVars(code) {
+    let i = 1;
     const map = {};
+    return code.replace(/\blocal\s+([a-zA-Z_][a-zA-Z0-9_]*)/g, (m, v) => {
+        if (!map[v]) map[v] = "_v" + (i++);
+        return "local " + map[v];
+    });
+}
 
-    while ((match = varRegex.exec(code)) !== null) {
-        const original = match[1];
-        if (!map[original]) {
-            map[original] = "v" + (counter++);
-        }
+function encryptStrings(code) {
+    return code.replace(/"([^"]*)"/g, (m, str) => {
+        const encoded = btoa(str);
+        return `(_D("${encoded}"))`;
+    });
+}
+
+function wrap(code) {
+    return `
+local b='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+
+local function _D(s)
+    return (function(data)
+        local t={}
+        for i=1,#data,4 do
+            local n=(string.find(b,data:sub(i,i))-1)*262144
+                +(string.find(b,data:sub(i+1,i+1))-1)*4096
+                +(string.find(b,data:sub(i+2,i+2))-1)*64
+                +(string.find(b,data:sub(i+3,i+3))-1)
+            table.insert(t,string.char(math.floor(n/65536)%256,math.floor(n/256)%256,n%256))
+        end
+        return table.concat(t)
+    end)(s)
+end
+
+(function()
+${code}
+end)()
+`;
+}
+
+function obfuscate(code, mode) {
+    code = stripComments(code);
+    code = minify(code);
+    code = renameVars(code);
+
+    if (mode !== "light") {
+        code = encryptStrings(code);
     }
 
-    // Erstatt alle forekomster av disse variablene
-    for (const [orig, renamed] of Object.entries(map)) {
-        const re = new RegExp("\\b" + orig + "\\b", "g");
-        code = code.replace(re, renamed);
+    if (mode === "strong") {
+        code = wrap(code);
     }
 
     return code;
 }
 
-function obfuscateLua(code) {
-    let result = code;
-
-    result = removeBlockComments(result);
-    result = removeLineComments(result);
-    result = compressWhitespace(result);
-    result = renameSimpleVariables(result);
-
-    return result;
-}
-
 document.addEventListener("DOMContentLoaded", () => {
     const input = document.getElementById("inputCode");
     const output = document.getElementById("outputCode");
-    const btn = document.getElementById("obfuscateBtn");
+    const mode = document.getElementById("mode");
+    const btn = document.getElementById("runBtn");
 
-    btn.addEventListener("click", () => {
-        const src = input.value || "";
-        const obf = obfuscateLua(src);
-        output.value = obf;
-    });
+    btn.onclick = () => {
+        output.value = obfuscate(input.value, mode.value);
+    };
 });
